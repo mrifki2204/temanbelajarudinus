@@ -11,6 +11,10 @@
     $jadwalTerpilih = old('jadwal', $profile?->jadwal ?? []);
     if (! is_array($jadwalTerpilih)) { $jadwalTerpilih = []; }
 
+    // Urutan hari eksplisit (Senin -> Minggu) agar tampilan konsisten,
+    // tidak bergantung pada urutan data dari database / orderBy('nilai').
+    $urutanHari = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+
     $jadwalPerHari = [];
     $jamPerSlot = []; // Pagi => '06-11', dst
     foreach ($opsi['jadwal'] as $j) {
@@ -20,6 +24,26 @@
             $jamPerSlot[$m[1]] = $m[2];
         }
     }
+
+    // Urutkan setiap slot dalam satu hari (Pagi -> Malam)
+    $urutanSlot = ['Pagi', 'Siang', 'Sore', 'Malam'];
+    foreach ($jadwalPerHari as $hari => $slots) {
+        usort($jadwalPerHari[$hari], function ($a, $b) use ($urutanSlot) {
+            $slotA = collect($urutanSlot)->search(fn($s) => str_starts_with($a, $s.' ')) ?? 99;
+            $slotB = collect($urutanSlot)->search(fn($s) => str_starts_with($b, $s.' ')) ?? 99;
+            return $slotA <=> $slotB;
+        });
+    }
+
+    // Susun ulang key hari sesuai urutan Senin -> Minggu.
+    $jadwalPerHariOrdered = [];
+    foreach ($urutanHari as $h) {
+        if (isset($jadwalPerHari[$h])) {
+            $jadwalPerHariOrdered[$h] = $jadwalPerHari[$h];
+        }
+    }
+    $jadwalPerHari = $jadwalPerHariOrdered;
+
     $slotKeys = ['Pagi', 'Siang', 'Sore', 'Malam'];
 @endphp
 
