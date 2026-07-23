@@ -1,0 +1,43 @@
+{
+    "Email": "Email",
+    "Password": "Kata Sandi",
+    "Remember me": "Ingat saya",
+    "Log in": "Masuk",
+    "Register": "Daftar",
+    "Forgot your password?": "Lupa kata sandi?",
+    "Already registered?": "Sudah punya akun?",
+    "Log in here": "Masuk di sini",
+    "Forgot your password": "Lupa kata sandi",
+    "Send password reset link": "Kirim tautan reset kata sandi",
+    "Reset password": "Reset kata sandi",
+    "Confirm password": "Konfirmasi kata sandi",
+    "Confirm": "Konfirmasi",
+
+    "These credentials do not match our records.": "Email atau kata sandi yang Anda masukkan tidak cocok.",
+    "Too many login attempts. Please try again in :seconds seconds.": "Terlalu banyak percobaan masuk. Silakan coba lagi dalam :seconds detik.",
+    "Too many login attempts. Please try again in :minutes minutes.": "Terlalu banyak percobaan masuk. Silakan coba lagi dalam :minutes menit.",
+
+    "The email field is required.": "Email wajib diisi.",
+    "The password field is required.": "Kata sandi wajib diisi.",
+    "The email must be a valid email address.": "Format email tidak valid.",
+    "The password must be at least 8 characters.": "Kata sandi minimal 8 karakter.",
+    "The password confirmation does not match.": "Konfirmasi kata sandi tidak cocok.",
+
+    "Verify your email": "Verifikasi email Anda",
+    "A fresh verification link has been sent to your email address.": "Tautan verifikasi baru telah dikirim ke alamat email Anda.",
+    "Before proceeding, please check your email for a verification link.": "Sebelum melanjutkan, periksa email Anda untuk tautan verifikasi.",
+    "If you did not receive the email": "Jika Anda tidak menerima email",
+    "click here to request another": "klik di sini untuk meminta ulang",
+    "Resend verification email": "Kirim ulang email verifikasi",
+    "Log out": "Keluar",
+
+    "Hello!": "Halo!",
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "Jika Anda kesulitan mengklik tombol \":actionText\", salin dan tempel URL berikut\nke peramban web Anda:",
+    "Reset Password Notification": "Notifikasi Reset Kata Sandi",
+    "You are receiving this email because we received a password reset request for your account.": "Anda menerima email ini karena kami menerima permintaan reset kata sandi untuk akun Anda.",
+    "This password reset link will expire in :count minutes.": "Tautan reset kata sandi ini akan kedaluwarsa dalam :count menit.",
+    "If you did not request a password reset, no further action is required.": "Jika Anda tidak meminta reset kata sandi, tidak ada tindakan lebih lanjut yang diperlukan.",
+    "Regards": "Salam",
+    "Reset Password": "Reset Kata Sandi",
+    "All rights reserved.": "Hak cipta dilindungi."
+}

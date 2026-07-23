@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* Sembunyikan elemen x-cloak sebelum Alpine.js inisialisasi */
+[x-cloak] { display: none !important; }
+
+/*
+ * Design system Teman Belajar Udinus (navy + oranye).
+ * Tailwind 4 pakai CSS-first config via @theme —
+ * token di bawah otomatis jadi utility class (mis. bg-tb-primary, text-tb-accent).
+ * Token --tb-* juga dipertahankan sebagai CSS variable karena komponen custom .tb-*
+ * di layouts/partials/theme.blade.php memakai var(--tb-*).
+ */
+@theme {
+  --color-tb-primary: #0b255b;
+  --color-tb-primary-dark: #071940;
+  --color-tb-primary-light: #e6ebf5;
+  --color-tb-primary-soft: #f4f6fb;
+  --color-tb-accent: #ffa73a;
+  --color-tb-accent-dark: #e88f1e;
+  --color-tb-accent-light: #fff4e3;
+  --color-tb-ink: #1a2b3c;
+  --color-tb-muted: #5a6b7d;
+
+  --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+/*
+ * Kompatibilitas: komponen custom .tb-* di theme.blade.php memakai var(--tb-*).
+ * Tailwind 4 tidak otomatis export @theme ke :root sebagai var() lama,
+ * jadi kita define ulang di :root agar CSS custom yang sudah ada tetap jalan.
+ */
+:root {
+  --tb-primary: #0b255b;
+  --tb-primary-dark: #071940;
+  --tb-primary-light: #e6ebf5;
+  --tb-primary-soft: #f4f6fb;
+  --tb-accent: #ffa73a;
+  --tb-accent-dark: #e88f1e;
+  --tb-accent-light: #fff4e3;
+  --tb-ink: #1a2b3c;
+  --tb-muted: #5a6b7d;
+}
