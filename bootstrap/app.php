@@ -17,8 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Penting di belakang reverse proxy (Nginx) + HTTPS (Let's Encrypt):
         // agar URL & asset yang di-generate pakai skema https yang benar.
+        // trustProxies('*') = percaya semua proxy (VPS single, di belakang Nginx).
         $middleware->trustProxies(at: '*');
-        $middleware->trustHosts(at: ['*']);
+        // TrustHosts: percaya host dari APP_URL saja.
+        // JANGAN pakai ['*'] — menyebabkan error regex
+        // "preg_match(): quantifier does not follow a repeatable item".
+        $middleware->trustHosts(at: [parse_url(env('APP_URL'), PHP_URL_HOST)]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

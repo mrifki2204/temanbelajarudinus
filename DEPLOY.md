@@ -120,6 +120,11 @@ DB_USERNAME=teman_belajar
 DB_PASSWORD=PASSWORD_KUAT_DI_SINI
 ```
 
+> ⚠️ **Penting:**
+> - Jika `DB_PASSWORD` mengandung karakter khusus (`#`, `=`, spasi, `$`), **bungkus dengan tanda kutip**, mis. `DB_PASSWORD="rahasia#123"`. Tanda `#` tanpa kutip dianggap awal komentar dan password terpotong.
+> - Pastikan `APP_MAINTENANCE_DRIVER=file` (bukan `database`) untuk VPS single — driver `database` butuh tabel maintenance tersendiri dan dapat menyebabkan error `Driver [database] not supported`.
+> - Setelah edit `.env`, **wajib** jalankan `php artisan config:cache` agar perubahan dibaca.
+
 ---
 
 ## 6. Migrasi & Optimasi
