@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Teman Belajar Udinus — Temukan Teman Belajar yang Cocok</title>
+    @include('layouts.partials.favicon')
     <meta name="description" content="Platform rekomendasi teman belajar untuk mahasiswa UDINUS berbasis Content-Based Filtering. Temukan partner belajar yang sesuai dengan minat, tujuan, gaya belajar, jadwal, dan mode belajar Anda.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
