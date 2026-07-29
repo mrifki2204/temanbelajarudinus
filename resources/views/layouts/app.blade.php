@@ -165,40 +165,64 @@
         .tb-main {
             margin-left: 220px; min-height: 100vh;
             display: flex; flex-direction: column;
+            min-width: 0;
+            width: auto;
         }
-        .tb-main-content { flex: 1; padding: 1.5rem 1.5rem 3rem; }
+        .tb-main-content {
+            flex: 1;
+            padding: 1.5rem 1.5rem 3rem;
+            min-width: 0;
+            max-width: 100%;
+            overflow-x: clip;
+        }
 
         .tb-mobile-toggle {
             display: none; position: fixed; top: 0.6rem; left: 0.6rem; z-index: 1050;
             background: white; border: 1px solid var(--tb-primary-light);
-            border-radius: 0.45rem; padding: 0.4rem 0.55rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08); color: var(--tb-primary);
+            border-radius: 0.45rem; padding: 0.55rem 0.65rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10); color: var(--tb-primary);
             cursor: pointer;
+            min-width: 44px; min-height: 44px;
+            align-items: center; justify-content: center;
         }
         .tb-mobile-toggle:hover { background: var(--tb-primary-soft); }
-        .tb-mobile-toggle svg { width: 1.15rem; height: 1.15rem; display: block; }
+        .tb-mobile-toggle svg { width: 1.25rem; height: 1.25rem; display: block; }
         .tb-overlay {
             display: none; position: fixed; inset: 0;
             background: rgba(0,0,0,0.4); z-index: 1035;
         }
         .tb-overlay.show { display: block; }
+        .tb-overlay[hidden] { display: none !important; }
+
+        /* Tablet */
         @media (max-width: 991.98px) {
-            .tb-sidebar { transform: translateX(-100%); }
-            .tb-sidebar.show { transform: translateX(0); box-shadow: 2px 0 12px rgba(0,0,0,0.12); }
+            .tb-sidebar { transform: translateX(-100%); width: min(280px, 86vw); }
+            .tb-sidebar.show { transform: translateX(0); box-shadow: 2px 0 16px rgba(0,0,0,0.14); }
             .tb-main { margin-left: 0; }
-            .tb-mobile-toggle { display: block; }
-            .tb-main-content { padding-top: 3rem; }
+            .tb-mobile-toggle { display: inline-flex; }
+            .tb-main-content { padding: 3.25rem 1rem 2.5rem; }
         }
+
+        /* Phone */
+        @media (max-width: 575.98px) {
+            .tb-main-content { padding: 3.1rem 0.75rem 2rem; }
+            .tb-sidebar { width: min(300px, 88vw); }
+            .tb-brand-logo { width: 56px; height: 56px; }
+            .tb-brand-logo img { width: 52px; height: 52px; }
+        }
+
+        /* Cegah scroll body saat drawer terbuka */
+        body.tb-drawer-open { overflow: hidden; touch-action: none; }
     </style>
     @include('layouts.partials.theme')
 </head>
 <body>
-    <button class="tb-mobile-toggle" onclick="document.querySelector('.tb-sidebar').classList.toggle('show');document.querySelector('.tb-overlay').classList.toggle('show')" aria-label="Buka menu navigasi">
+    <button type="button" class="tb-mobile-toggle" id="tbMobileToggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="tbSidebar">
         <x-icon name="list" />
     </button>
-    <div class="tb-overlay" onclick="document.querySelector('.tb-sidebar').classList.remove('show');this.classList.remove('show')"></div>
+    <div class="tb-overlay" id="tbOverlay" hidden></div>
 
-    <div class="tb-sidebar">
+    <div class="tb-sidebar" id="tbSidebar">
         @include('layouts.navigation')
     </div>
 
@@ -209,9 +233,45 @@
         </main>
     </div>
 
-    {{-- Instant search: form dengan class .tb-instant-search auto-submit saat input/select berubah (debounced) --}}
+    {{-- Mobile drawer + instant search --}}
     <script>
     (function () {
+        function initDrawer() {
+            var sidebar = document.getElementById('tbSidebar');
+            var overlay = document.getElementById('tbOverlay');
+            var toggle = document.getElementById('tbMobileToggle');
+            if (!sidebar || !overlay || !toggle) return;
+
+            function setOpen(open) {
+                sidebar.classList.toggle('show', open);
+                overlay.classList.toggle('show', open);
+                overlay.hidden = !open;
+                document.body.classList.toggle('tb-drawer-open', open);
+                toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                toggle.setAttribute('aria-label', open ? 'Tutup menu navigasi' : 'Buka menu navigasi');
+            }
+
+            toggle.addEventListener('click', function () {
+                setOpen(!sidebar.classList.contains('show'));
+            });
+            overlay.addEventListener('click', function () { setOpen(false); });
+
+            // Tutup drawer setelah klik link navigasi (mobile)
+            sidebar.querySelectorAll('a.tb-sidebar-link, a.tb-sidebar-sub-link').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    if (window.matchMedia('(max-width: 991.98px)').matches) setOpen(false);
+                });
+            });
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') setOpen(false);
+            });
+
+            window.addEventListener('resize', function () {
+                if (window.matchMedia('(min-width: 992px)').matches) setOpen(false);
+            });
+        }
+
         function initInstantSearch() {
             document.querySelectorAll('form.tb-instant-search:not([data-instant-bound])').forEach(function (form) {
                 form.setAttribute('data-instant-bound', '1');
@@ -219,7 +279,6 @@
                 var inputs = form.querySelectorAll('input[name]:not([type="hidden"]):not([type="submit"]), select[name]');
 
                 function submit() {
-                    // Hapus parameter kosong agar URL bersih
                     inputs.forEach(function (el) {
                         if (!el.value) el.name = '';
                     });
@@ -230,14 +289,16 @@
                     var evt = el.tagName === 'SELECT' ? 'change' : 'input';
                     el.addEventListener(evt, function () {
                         clearTimeout(timer);
-                        // Select langsung submit (tidak perlu debounce),
-                        // teks debounced agar tidak request per ketukan.
                         timer = setTimeout(submit, el.tagName === 'SELECT' ? 0 : 350);
                     });
                 });
             });
         }
-        document.addEventListener('DOMContentLoaded', initInstantSearch);
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initDrawer();
+            initInstantSearch();
+        });
         document.addEventListener('alpine:initialized', initInstantSearch);
     })();
     </script>

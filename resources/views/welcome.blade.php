@@ -244,6 +244,43 @@
         .tb-animate-3 { animation-delay: 0.24s; }
         .tb-animate-4 { animation-delay: 0.36s; }
         @media (prefers-reduced-motion: reduce) { .tb-animate { animation: none; } }
+
+        /* ===== RESPONSIVE LANDING ===== */
+        .tb-hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+        .tb-hero-preview { min-width: 0; }
+        .tb-footer-grid { display: grid; gap: 1.5rem; }
+
+        @media (max-width: 1023.98px) {
+            .tb-section-full { min-height: auto; padding-top: calc(var(--tb-nav-h) + 1.25rem); padding-bottom: 2.5rem; }
+            .tb-hero .mx-auto { padding-top: 1.25rem !important; padding-bottom: 1.25rem !important; }
+            .tb-hero-title { font-size: clamp(1.7rem, 6vw, 2.6rem); }
+            .tb-hero-actions { width: 100%; }
+            .tb-hero-actions .btn-hero-primary,
+            .tb-hero-actions .btn-hero-outline { width: 100%; justify-content: center; }
+        }
+
+        @media (max-width: 767.98px) {
+            :root { --tb-nav-h: 58px; }
+            .tb-nav-inner { padding-left: 0.85rem; padding-right: 0.85rem; gap: 0.5rem; }
+            .tb-nav-brand img { width: 30px; height: 30px; }
+            .tb-brand-text { font-size: 0.95rem; }
+            .tb-nav-menu { display: none !important; }
+            .tb-nav-actions .btn-nav-ghost { display: none !important; }
+            .btn-hero-primary, .btn-hero-outline {
+                padding: 0.8rem 1.15rem; font-size: 0.95rem; width: 100%;
+            }
+            .tb-pill { font-size: 0.75rem; padding: 0.35rem 0.75rem; }
+            .tb-footer { padding: 2rem 0 1rem; }
+            .tb-footer-grid { grid-template-columns: 1fr !important; }
+            .tb-section-full { padding-left: 0; padding-right: 0; }
+            .tb-rec-row small { display: block; line-height: 1.35; }
+        }
+
+        @media (max-width: 479.98px) {
+            .tb-hero-title { font-size: 1.55rem; }
+            .tb-nav-brand .tb-brand-text span:first-child { display: none; }
+            .tb-nav-brand .tb-brand-text { font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
@@ -303,7 +340,7 @@
                     <p class="tb-hero-sub mt-4 tb-animate tb-animate-3">
                         Berhenti mencari teman belajar secara acak. Isi profil preferensi Anda sekali, dan biarkan sistem mencocokkan Anda dengan mahasiswa UDINUS lain yang punya minat, tujuan, gaya belajar, jadwal, dan mode belajar selaras.
                     </p>
-                    <div class="flex flex-wrap gap-3 mt-6 tb-animate tb-animate-4">
+                    <div class="tb-hero-actions mt-6 tb-animate tb-animate-4">
                         @guest
                             <a href="{{ route('register') }}" class="btn-hero-primary">
                                 <x-icon name="person-plus" /> Mulai Gratis Sekarang
@@ -543,7 +580,7 @@
                     <p class="mb-6 mt-3" style="opacity:0.88;font-size:1.1rem;">
                         Gabung sekarang — gratis, cukup gunakan email mahasiswa UDINUS Anda.
                     </p>
-                    <div class="flex flex-wrap justify-center gap-3">
+                    <div class="tb-hero-actions justify-center">
                         @guest
                             <a href="{{ route('register') }}" class="btn-hero-primary">
                                 <x-icon name="person-plus" /> Daftar Sekarang

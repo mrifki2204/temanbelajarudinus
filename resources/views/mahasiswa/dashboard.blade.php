@@ -90,8 +90,19 @@
     .tb-greet-hint a:hover { text-decoration: underline; }
 
     /* ===== STATS ===== */
-    .tb-stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
-    @media (max-width: 575.98px) { .tb-stats-row { grid-template-columns: 1fr 1fr; } }
+    .tb-stats-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+    @media (max-width: 991.98px) { .tb-stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 379.98px) { .tb-stats-row { grid-template-columns: 1fr; } }
+    @media (max-width: 575.98px) {
+        .tb-greet { padding: 1.15rem 1rem; }
+        .tb-greet h2 { font-size: 1.15rem; }
+        .tb-greet-right { align-items: flex-start; width: 100%; }
+        .tb-dash-stat { padding: 0.8rem 0.85rem; }
+        .tb-dash-stat-num { font-size: 1.35rem; }
+        .tb-profil-simple-info { min-width: 0; flex: 1 1 100%; }
+        .tb-profil-edit { width: 100%; }
+        .tb-profil-edit .tb-btn { width: 100%; }
+    }
     .tb-dash-stat {
         background: white; border: 1px solid var(--tb-primary-light);
         border-radius: 0.75rem; padding: 0.9rem 1rem; position: relative; overflow: hidden;

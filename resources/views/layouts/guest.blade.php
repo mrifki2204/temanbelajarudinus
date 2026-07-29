@@ -37,7 +37,9 @@
             justify-content: center;
             padding: 1.5rem 1.25rem;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
+            min-width: 0;
         }
         .tb-auth-body::before {
             content: "";
@@ -80,7 +82,10 @@
             border-radius: 1.25rem 1.25rem 0 0;
         }
         @media (max-width: 575.98px) {
-            .tb-auth-card { padding: 1.75rem 1.5rem; border-radius: 1rem; }
+            .tb-auth-body { padding: 1rem 0.85rem 1.5rem; align-items: flex-start; }
+            .tb-auth-card { padding: 1.5rem 1.1rem; border-radius: 1rem; max-width: 100%; }
+            .tb-auth-title { font-size: 1.3rem; }
+            .tb-auth-subtitle { font-size: 0.84rem; margin-bottom: 1.25rem; }
         }
 
         .tb-auth-logo-row {

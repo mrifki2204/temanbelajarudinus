@@ -8,11 +8,17 @@
 @endphp
 
 <style>
-    .tb-filter-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; align-items: end; }
-    @media (max-width: 767.98px) { .tb-filter-row { grid-template-columns: 1fr; } }
+    .tb-filter-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; align-items: end; }
+    @media (max-width: 991.98px) { .tb-filter-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 575.98px) { .tb-filter-row { grid-template-columns: 1fr; } }
 
-    .tb-rec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .tb-rec-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
     @media (max-width: 767.98px) { .tb-rec-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 575.98px) {
+        .tb-rec-card { padding: 1rem; }
+        .tb-rec-head { gap: 0.65rem; }
+        .tb-rec-name { font-size: 0.9rem; word-break: break-word; }
+    }
 
     .tb-rec-card {
         background: white; border: 1px solid var(--tb-primary-light); border-radius: 0.85rem;

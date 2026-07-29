@@ -5,10 +5,11 @@
 --}}
 <style>
     /* ============ PAGE HEAD ============ */
-    .tb-page-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem; }
-    .tb-page-head-text h1 { font-size: 1.35rem; font-weight: 800; color: var(--tb-ink); margin: 0 0 0.15rem; letter-spacing: -0.02em; }
-    .tb-page-head-text p { font-size: 0.82rem; color: var(--tb-muted); margin: 0; }
-    .tb-page-head-actions { display: flex; gap: 0.5rem; align-items: center; }
+    .tb-page-head { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem; }
+    .tb-page-head-text { min-width: 0; flex: 1 1 200px; }
+    .tb-page-head-text h1 { font-size: clamp(1.1rem, 2.8vw, 1.35rem); font-weight: 800; color: var(--tb-ink); margin: 0 0 0.15rem; letter-spacing: -0.02em; line-height: 1.25; word-break: break-word; }
+    .tb-page-head-text p { font-size: 0.82rem; color: var(--tb-muted); margin: 0; line-height: 1.45; }
+    .tb-page-head-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
 
     /* ============ CARD ============ */
     .tb-card {
@@ -40,11 +41,11 @@
     /* ============ BUTTONS ============ */
     .tb-btn {
         display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
-        height: 42px; padding: 0 1.1rem;
+        min-height: 42px; height: auto; padding: 0.55rem 1.1rem;
         background: var(--tb-primary); color: white; border: 1px solid var(--tb-primary);
         border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer;
         text-decoration: none; transition: background 0.15s ease, transform 0.1s ease;
-        white-space: nowrap;
+        white-space: nowrap; line-height: 1.2;
     }
     .tb-btn:hover { background: var(--tb-primary-dark); border-color: var(--tb-primary-dark); color: white; }
     .tb-btn:active { transform: translateY(1px); }
@@ -143,7 +144,40 @@
     .tb-table td { padding: 0.7rem 0.85rem; border-bottom: 1px solid var(--tb-primary-light); color: var(--tb-ink); vertical-align: middle; }
     .tb-table tbody tr:last-child td { border-bottom: none; }
     .tb-table tbody tr:hover { background: var(--tb-primary-soft); }
-    .tb-table-wrap { overflow-x: auto; }
+    .tb-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+        max-width: 100%;
+    }
+    .tb-table-wrap .tb-table { min-width: 640px; }
+
+    /* Action buttons di tabel: tetap rapi di layar sempit */
+    .tb-table .tb-actions,
+    .tb-table td .tb-btn-group,
+    .tb-table td form {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        align-items: center;
+    }
+
+    @media (max-width: 767.98px) {
+        .tb-card { padding: 0.9rem; border-radius: 0.65rem; }
+        .tb-section-head { flex-wrap: wrap; align-items: flex-start; }
+        .tb-section-title { font-size: 0.88rem; }
+        .tb-table { font-size: 0.8rem; }
+        .tb-table th, .tb-table td { padding: 0.55rem 0.65rem; }
+        .tb-table-wrap .tb-table { min-width: 560px; }
+        .tb-btn { padding: 0.5rem 0.85rem; font-size: 0.82rem; }
+        .tb-page-head { margin-bottom: 1rem; }
+        .tb-empty { padding: 1.5rem 0.75rem; }
+    }
+
+    @media (max-width: 575.98px) {
+        .tb-page-head-actions .tb-btn { width: 100%; }
+        .tb-page-head-actions { width: 100%; }
+    }
 
     /* ============ EMPTY STATE ============ */
     .tb-empty { text-align: center; padding: 2rem 1rem; }

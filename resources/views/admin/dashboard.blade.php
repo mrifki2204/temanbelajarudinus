@@ -46,7 +46,7 @@
 
     /* ===== STAT CARDS ===== */
     .tb-admin-stats {
-        display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.85rem; margin-bottom: 1rem;
+        display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.85rem; margin-bottom: 1rem;
     }
     .tb-admin-stat {
         background: white; border: 1px solid var(--tb-primary-light);
@@ -105,10 +105,16 @@
     .tb-admin-pagination :is(nav, ul) { margin-bottom: 0; }
 
     @media (max-width: 1199px) { .tb-admin-grid-2 { grid-template-columns: 1fr; } }
-    @media (max-width: 991px) { .tb-admin-stats { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 991px) {
+        .tb-admin-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .tb-admin-greet { padding: 1.15rem 1.1rem; }
+        .tb-admin-greet h2 { font-size: 1.2rem; }
+    }
     @media (max-width: 575px) {
         .tb-admin-stats { grid-template-columns: 1fr; }
         .tb-admin-greet-badge { position: static; margin-top: 0.6rem; display: inline-flex; }
+        .tb-admin-stat { padding: 0.85rem; }
+        .tb-admin-stat-num { font-size: 1.35rem; }
     }
 </style>
 

@@ -40,3 +40,37 @@
   --tb-ink: #1a2b3c;
   --tb-muted: #5a6b7d;
 }
+
+/* ===== Global responsive base ===== */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Safe area untuk notch / home indicator */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Touch target minimum di mobile */
+@media (max-width: 767.98px) {
+  button,
+  .tb-btn,
+  .tb-sidebar-link,
+  .tb-tab,
+  a.tb-rec-detail-btn {
+    min-height: 44px;
+  }
+}

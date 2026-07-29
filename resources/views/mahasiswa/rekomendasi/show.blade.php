@@ -83,9 +83,11 @@
     @media (max-width: 575.98px) {
         .tb-show-profile { gap: 0.85rem; }
         .tb-show-avatar { width: 58px; height: 58px; font-size: 1.4rem; }
-        .tb-show-name { font-size: 1.2rem; }
-        .tb-show-score { padding: 0.6rem 0.85rem; min-width: 95px; }
-        .tb-show-score-num { font-size: 1.6rem; }
+        .tb-show-name { font-size: 1.15rem; word-break: break-word; }
+        .tb-show-score { padding: 0.6rem 0.85rem; min-width: 0; width: 100%; }
+        .tb-show-score-num { font-size: 1.5rem; }
+        .tb-show-identity { flex: 1 1 100%; }
+        .tb-show-meta-row { gap: 0.35rem; }
     }
 
     /* ============ SECTION TITLE DALAM CARD ============ */

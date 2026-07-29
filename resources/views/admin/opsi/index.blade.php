@@ -39,8 +39,15 @@
     /* Pencarian dalam kategori */
     .tb-opsi-search-bar { margin-bottom: 1rem; }
     .tb-opsi-toolbar { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: stretch; }
-    .tb-opsi-toolbar .tb-btn { height: 46px; }
-    .tb-opsi-search { position: relative; display: flex; align-items: center; flex: 1; min-width: 220px; }
+    .tb-opsi-toolbar .tb-btn { min-height: 46px; height: auto; }
+    .tb-opsi-search { position: relative; display: flex; align-items: center; flex: 1 1 220px; min-width: 0; }
+    @media (max-width: 767.98px) {
+        .tb-opsi-toolbar .tb-btn,
+        .tb-opsi-search { flex: 1 1 100%; width: 100%; }
+        .tb-opsi-hero-actions { width: 100%; }
+        .tb-opsi-hero-actions .tb-btn { flex: 1 1 auto; }
+        .tb-search-count { margin-left: 0; width: 100%; }
+    }
     .tb-opsi-search > svg {
         position: absolute; left: 0.95rem; width: 1.05rem; height: 1.05rem;
         color: var(--tb-muted); pointer-events: none;

@@ -75,7 +75,17 @@
     .tb-req-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
     /* Tombol kecil khusus aksi */
-    .tb-btn-icon { width: 36px; padding: 0; }
+    .tb-btn-icon { width: 36px; min-width: 36px; padding: 0; }
+
+    @media (max-width: 575.98px) {
+        .tb-tab { flex: 1 1 calc(50% - 0.25rem); justify-content: center; min-height: 44px; }
+        .tb-req-top { gap: 0.65rem; }
+        .tb-req-name { font-size: 0.9rem; word-break: break-word; }
+        .tb-req-foot { flex-direction: column; align-items: stretch; }
+        .tb-req-actions { width: 100%; }
+        .tb-req-actions .tb-btn { flex: 1 1 auto; justify-content: center; }
+        .tb-req-skor { align-self: flex-start; }
+    }
 </style>
 
 {{-- ============ PAGE HEAD ============ --}}

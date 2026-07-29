@@ -12,9 +12,14 @@
         margin-bottom: 1rem;
     }
     .tb-fak-toolbar { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: stretch; }
-    .tb-fak-toolbar .tb-btn { height: 46px; }
+    .tb-fak-toolbar .tb-btn { min-height: 46px; height: auto; }
     .tb-fak-search {
-        position: relative; display: flex; align-items: center; flex: 1; min-width: 220px;
+        position: relative; display: flex; align-items: center; flex: 1 1 220px; min-width: 0;
+    }
+    @media (max-width: 767.98px) {
+        .tb-fak-toolbar .tb-btn,
+        .tb-fak-search { flex: 1 1 100%; width: 100%; }
+        .tb-search-count { margin-left: 0; width: 100%; }
     }
     .tb-fak-search > svg {
         position: absolute; left: 0.95rem; width: 1.05rem; height: 1.05rem;

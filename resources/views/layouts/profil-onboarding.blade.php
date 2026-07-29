@@ -37,6 +37,8 @@
             padding: 2rem 1.25rem 3rem;
             display: flex;
             justify-content: center;
+            min-width: 0;
+            overflow-x: clip;
         }
 
         .tb-onboard-card {
@@ -48,6 +50,7 @@
             box-shadow: 0 20px 50px rgba(11, 37, 91, 0.08), 0 4px 12px rgba(0,0,0,0.03);
             padding: 2rem 2.25rem;
             position: relative;
+            min-width: 0;
         }
         .tb-onboard-card::before {
             content: "";
@@ -58,7 +61,10 @@
             border-radius: 1.25rem 1.25rem 0 0;
         }
         @media (max-width: 575.98px) {
-            .tb-onboard-card { padding: 1.5rem 1.25rem; border-radius: 1rem; }
+            .tb-onboard-body { padding: 1rem 0.75rem 2rem; }
+            .tb-onboard-card { padding: 1.25rem 0.95rem; border-radius: 1rem; }
+            .tb-onboard-title { font-size: 1.25rem; }
+            .tb-onboard-subtitle { font-size: 0.84rem; margin-bottom: 1.25rem; }
         }
 
         .tb-onboard-title {
