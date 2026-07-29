@@ -38,7 +38,7 @@ class ProfileObserver
         $this->cbfService->calculateForUser($owner);
 
         // 2. Update skor reverse: seluruh user lain (profil lengkap) → owner
-        $this->recalcReverseScores($owner);
+        $this->cbfService->recalcReverseScores($owner);
     }
 
     /**
@@ -53,42 +53,5 @@ class ProfileObserver
 
         SimilarityScore::where('user_id', $owner->id)->delete();
         SimilarityScore::where('kandidat_id', $owner->id)->delete();
-    }
-
-    /**
-     * Hitung ulang skor reverse untuk seluruh user lain (profil lengkap) → $owner.
-     * Penting saat user baru dibuat: user lama belum punya skor ke user baru,
-     * jadi tidak cukup hanya update yang sudah ada.
-     */
-    protected function recalcReverseScores(User $owner): void
-    {
-        $ownerProfile = $owner->fresh('profile')->profile;
-        if (! $ownerProfile || ! $this->cbfService->isProfileLengkap($ownerProfile)) {
-            return;
-        }
-
-        $ownerVector = $this->cbfService->buildFeatureVector($ownerProfile);
-
-        // Ambil seluruh user lain yang profil lengkap (bukan hanya yang sudah punya skor)
-        $otherUsers = User::where('role', 'mahasiswa')
-            ->where('status', 'aktif')
-            ->where('id', '!=', $owner->id)
-            ->whereHas('profile')
-            ->with('profile')
-            ->get();
-
-        foreach ($otherUsers as $otherUser) {
-            if (! $this->cbfService->isProfileLengkap($otherUser->profile)) {
-                continue;
-            }
-
-            $otherVector = $this->cbfService->buildFeatureVector($otherUser->profile);
-            $skor = $this->cbfService->cosineSimilarity($otherVector, $ownerVector);
-
-            SimilarityScore::updateOrCreate(
-                ['user_id' => $otherUser->id, 'kandidat_id' => $owner->id],
-                ['skor' => $skor]
-            );
-        }
     }
 }

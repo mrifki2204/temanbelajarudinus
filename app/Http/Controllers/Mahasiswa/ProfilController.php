@@ -12,7 +12,6 @@ use App\Models\Profile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -116,42 +115,13 @@ class ProfilController extends Controller
             'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
         ]);
 
+        // Matikan session device lain (cookie dicuri tidak lagi valid).
+        Auth::logoutOtherDevices($validated['current_password']);
+
         $request->user()->update([
-            'password' => Hash::make($validated['password']),
+            'password' => $validated['password'],
         ]);
 
-        return redirect()->route('profil.edit')->with('success', 'Kata sandi berhasil diperbarui.');
-    }
-
-    /**
-     * Hapus akun.
-     */
-    public function destroy(Request $request): RedirectResponse
-    {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
-        $user = $request->user();
-        $namaUser = $user->nama;
-
-        // Catat sebelum logout & delete (setelah ini auth()->user() = null).
-        ActivityLog::record(
-            'mahasiswa.self-delete',
-            "Mahasiswa {$namaUser} menghapus akunnya sendiri.",
-            null,
-            ['nama' => $namaUser, 'email' => $user->email, 'nim' => $user->nim],
-        );
-
-        // Logout & invalidate session SEBELUM delete user. Auth::logout() memanggil
-        // $user->save() (untuk refresh remember_token) — jika dilakukan setelah delete,
-        // save() akan men-INSERT ulang user yang sudah dihapus.
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        $user->delete();
-
-        return redirect('/');
+        return redirect()->route('setting.index')->with('success', 'Kata sandi berhasil diperbarui.');
     }
 }

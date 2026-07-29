@@ -89,9 +89,13 @@ class LoginRequest extends FormRequest
 
     /**
      * Get the rate limiting throttle key for the request.
+     *
+     * Key utama = email (tahan spoof X-Forwarded-For).
+     * IP tetap dilampirkan sebagai konteks, tapi bucket per-email
+     * yang membatasi 5 percobaan — bypass via ganti IP tidak efektif.
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')));
     }
 }

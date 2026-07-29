@@ -4,6 +4,7 @@ namespace App\Http\Requests\Mahasiswa;
 
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class RegistrationRequest extends FormRequest
@@ -26,9 +27,12 @@ class RegistrationRequest extends FormRequest
             ],
             'password' => ['required', 'confirmed', Password::defaults()],
 
-            // Info akademik
+            // Info akademik — prodi harus milik fakultas terpilih
             'fakultas_id' => ['required', 'exists:fakultas,id'],
-            'prodi_id' => ['required', 'exists:prodi,id'],
+            'prodi_id' => [
+                'required',
+                Rule::exists('prodi', 'id')->where(fn ($q) => $q->where('fakultas_id', $this->input('fakultas_id'))),
+            ],
             'semester' => ['required', 'integer', 'min:1', 'max:14'],
             'angkatan' => ['required', 'integer', 'min:2000', 'max:'.(int) date('Y')],
         ];
@@ -50,6 +54,7 @@ class RegistrationRequest extends FormRequest
             'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
             'fakultas_id.required' => 'Fakultas wajib dipilih.',
             'prodi_id.required' => 'Program studi wajib dipilih.',
+            'prodi_id.exists' => 'Program studi tidak valid untuk fakultas yang dipilih.',
             'semester.required' => 'Semester wajib diisi.',
             'semester.integer' => 'Semester harus berupa angka.',
             'angkatan.required' => 'Tahun angkatan wajib diisi.',

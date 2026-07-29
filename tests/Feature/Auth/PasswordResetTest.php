@@ -23,18 +23,45 @@ class PasswordResetTest extends TestCase
     {
         Notification::fake();
 
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'mahasiswa', 'status' => 'aktif']);
 
-        $this->post('/forgot-password', ['email' => $user->email]);
+        $response = $this->post('/forgot-password', ['email' => $user->email]);
 
+        $response->assertSessionHas('status');
         Notification::assertSentTo($user, ResetPassword::class);
+    }
+
+    public function test_reset_password_tidak_enumerasi_email_tidak_terdaftar(): void
+    {
+        Notification::fake();
+
+        $response = $this->from('/forgot-password')
+            ->post('/forgot-password', ['email' => 'tidakada@mhs.dinus.ac.id']);
+
+        // Response sama (sukses generik) — tidak bocorkan apakah email ada
+        $response->assertSessionHas('status');
+        $response->assertSessionDoesntHaveErrors('email');
+        Notification::assertNothingSent();
+    }
+
+    public function test_reset_password_tidak_dikirim_ke_admin_atau_nonaktif(): void
+    {
+        Notification::fake();
+
+        $admin = User::factory()->create(['role' => 'admin', 'status' => 'aktif']);
+        $nonaktif = User::factory()->create(['role' => 'mahasiswa', 'status' => 'nonaktif']);
+
+        $this->post('/forgot-password', ['email' => $admin->email]);
+        $this->post('/forgot-password', ['email' => $nonaktif->email]);
+
+        Notification::assertNothingSent();
     }
 
     public function test_reset_password_screen_can_be_rendered(): void
     {
         Notification::fake();
 
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'mahasiswa', 'status' => 'aktif']);
 
         $this->post('/forgot-password', ['email' => $user->email]);
 
@@ -51,7 +78,7 @@ class PasswordResetTest extends TestCase
     {
         Notification::fake();
 
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role' => 'mahasiswa', 'status' => 'aktif']);
 
         $this->post('/forgot-password', ['email' => $user->email]);
 

@@ -3,10 +3,9 @@
 namespace App\Http\Requests\Mahasiswa;
 
 use App\Models\StudyRequest;
-use App\Models\User;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -53,20 +52,27 @@ class PermintaanStoreRequest extends FormRequest
             // 1. Tidak boleh kirim ke diri sendiri
             if ($penerimaId === (int) $pengirim->id) {
                 $validator->errors()->add('penerima_id', 'Anda tidak dapat mengirim permintaan kepada diri sendiri.');
+
                 return;
             }
 
-            // 2. Profil pengirim harus lengkap
-            if (! $pengirim->profile || ! $pengirim->profile->minat) {
+            // 2. Profil pengirim harus lengkap (5 preferensi CBF)
+            $pengirim->loadMissing('profile');
+            if (! $pengirim->profile || ! $pengirim->profile->isPreferensiLengkap()) {
                 $validator->errors()->add('penerima_id', 'Lengkapi profil preferensi Anda terlebih dahulu sebelum mengirim permintaan.');
+
                 return;
             }
 
-            // 3. Tidak boleh ada permintaan aktif (pending atau accepted) ke penerima yang sama
-            $sudahAktif = StudyRequest::where('pengirim_id', $pengirim->id)
-                ->where('penerima_id', $penerimaId)
-                ->whereIn('status', ['pending', 'accepted'])
-                ->exists();
+            // 3. Tidak boleh ada permintaan aktif (pending/accepted) — lock baris
+            //    untuk cegah race double-submit paralel.
+            $sudahAktif = DB::transaction(function () use ($pengirim, $penerimaId) {
+                return StudyRequest::where('pengirim_id', $pengirim->id)
+                    ->where('penerima_id', $penerimaId)
+                    ->whereIn('status', ['pending', 'accepted'])
+                    ->lockForUpdate()
+                    ->exists();
+            });
 
             if ($sudahAktif) {
                 $validator->errors()->add('penerima_id', 'Anda sudah memiliki permintaan aktif (menunggu respons atau diterima) kepada mahasiswa ini.');

@@ -13,7 +13,7 @@
     $now = now();
     $tanggalStr = $hariId[$now->format('l')] . ', ' . $now->format('j') . ' ' . $bulanId[(int) $now->format('n')] . ' ' . $now->format('Y');
 
-    $profilLengkap = ! $isAdmin && $user->profile && $user->profile->minat;
+    $profilLengkap = ! $isAdmin && $user->profile && $user->profile->isPreferensiLengkap();
 
     // Ucapan kontekstual berdasarkan waktu — bukan duplikasi info dari card lain.
     $jam = (int) $now->format('H');

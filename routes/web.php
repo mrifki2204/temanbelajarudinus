@@ -18,17 +18,17 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
+// Dashboard: auth saja (admin & mahasiswa). Status nonaktif di-handle EnsureUserIsActive.
 Route::middleware('auth')->group(function () {
-    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Profil preferensi (mahasiswa)
-    Route::get('/profil', [ProfilController::class, 'edit'])->name('profil.edit');
-    Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');
 });
 
-// Route mahasiswa
+// Route khusus mahasiswa (profil, rekomendasi, permintaan, setting)
 Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
+    // Profil preferensi
+    Route::get('/profil', [ProfilController::class, 'edit'])->name('profil.edit');
+    Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');
+
     // Rekomendasi
     Route::get('/rekomendasi', [RekomendasiController::class, 'index'])->name('rekomendasi.index');
     Route::get('/rekomendasi/{kandidatId}', [RekomendasiController::class, 'show'])->name('rekomendasi.show');
@@ -40,10 +40,9 @@ Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
     Route::patch('/permintaan/{permintaan}/reject', [PermintaanBelajarController::class, 'reject'])->name('permintaan.reject');
     Route::delete('/permintaan/{permintaan}', [PermintaanBelajarController::class, 'cancel'])->name('permintaan.destroy');
 
-    // Setting (keamanan, hapus akun)
+    // Setting (keamanan)
     Route::get('/setting', [ProfilController::class, 'setting'])->name('setting.index');
     Route::put('/setting/password', [ProfilController::class, 'updatePassword'])->name('profil.password.update');
-    Route::delete('/setting', [ProfilController::class, 'destroy'])->name('profil.destroy');
 
     // Log aktivitas mahasiswa (riwayat sendiri)
     Route::get('/aktivitas', [MahasiswaAktivitasController::class, 'index'])->name('aktivitas.index');

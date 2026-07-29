@@ -86,6 +86,9 @@ class RekomendasiController extends Controller
      * Tampilkan detail kandidat + tombol kirim permintaan belajar.
      *
      * Kontak (WA/IG) TIDAK ditampilkan di sini — hanya terlihat setelah permintaan diterima.
+     *
+     * Akses dibatasi: hanya kandidat yang punya similarity score ke viewer,
+     * ATAU ada relasi permintaan (kirim/terima) — cegah enumerasi ID sembarangan.
      */
     public function show(Request $request, int $kandidatId): View
     {
@@ -97,18 +100,31 @@ class RekomendasiController extends Controller
             ->where('id', '!=', $user->id)
             ->findOrFail($kandidatId);
 
-        // Ambil skor similaritas user → kandidat (jika ada)
+        $punyaSkor = \App\Models\SimilarityScore::where('user_id', $user->id)
+            ->where('kandidat_id', $kandidatId)
+            ->exists();
+
+        $punyaRelasi = StudyRequest::where(function ($q) use ($user, $kandidatId) {
+            $q->where(function ($q2) use ($user, $kandidatId) {
+                $q2->where('pengirim_id', $user->id)->where('penerima_id', $kandidatId);
+            })->orWhere(function ($q2) use ($user, $kandidatId) {
+                $q2->where('pengirim_id', $kandidatId)->where('penerima_id', $user->id);
+            });
+        })->exists();
+
+        if (! $punyaSkor && ! $punyaRelasi) {
+            abort(404);
+        }
+
         $skor = \App\Models\SimilarityScore::where('user_id', $user->id)
             ->where('kandidat_id', $kandidatId)
             ->value('skor');
 
-        // Cek status permintaan yang sudah ada ke kandidat ini
         $permintaanTerkirim = StudyRequest::where('pengirim_id', $user->id)
             ->where('penerima_id', $kandidatId)
             ->latest()
             ->first();
 
-        // Cek apakah kandidat ini sudah punya hubungan accepted dengan user
         $sudahTerhubung = StudyRequest::where('status', 'accepted')
             ->where(function ($q) use ($user, $kandidatId) {
                 $q->where(function ($q2) use ($user, $kandidatId) {
@@ -119,7 +135,6 @@ class RekomendasiController extends Controller
             })
             ->exists();
 
-        // Jika sudah terhubung (accepted), tampilkan kontak
         $tampilkanKontak = $sudahTerhubung;
 
         return view('mahasiswa.rekomendasi.show', compact(

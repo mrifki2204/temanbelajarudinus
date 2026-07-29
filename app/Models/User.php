@@ -19,12 +19,14 @@ class User extends Authenticatable
         'jenis_kelamin',
         'email',
         'nim',
+        // role & status di fillable untuk factory/seeder; JANGAN mass-assign dari request.
+        // Registration & admin update set field secara eksplisit, bukan $request->all().
         'role',
+        'status',
         'fakultas_id',
         'prodi_id',
         'semester',
         'angkatan',
-        'status',
         'password',
     ];
 

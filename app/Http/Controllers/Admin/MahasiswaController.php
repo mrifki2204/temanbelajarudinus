@@ -13,6 +13,8 @@ use App\Models\User;
 use App\Services\ContentBasedFilteringService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class MahasiswaController extends Controller
@@ -107,28 +109,33 @@ class MahasiswaController extends Controller
     /**
      * Toggle status akun mahasiswa: aktif ↔ nonaktif.
      *
-     * Saat menonaktifkan: hapus seluruh similarity_scores terkait user ini
-     * (baik sebagai user_id maupun kandidat_id) agar tidak muncul di rekomendasi
-     * mahasiswa lain hingga user diaktifkan kembali.
+     * Saat menonaktifkan:
+     * - hapus similarity_scores (forward & reverse)
+     * - invalidate session DB + remember_token (cegah akses sisa session)
      *
-     * Saat mengaktifkan kembali: recalc skor user ini (forward) lewat observer
-     * tidak terpicu karena profil tidak berubah, jadi panggil service langsung.
+     * Saat mengaktifkan kembali:
+     * - recalc forward + reverse skor segera (observer tidak terpicu)
      */
     public function toggleStatus(Request $request, User $mahasiswa): RedirectResponse
     {
         $newStatus = $mahasiswa->status === 'aktif' ? 'nonaktif' : 'aktif';
+
         $mahasiswa->update(['status' => $newStatus]);
 
         if ($newStatus === 'nonaktif') {
-            // Hapus skor terkait user ini (sebagai pencari & sebagai kandidat)
             SimilarityScore::where('user_id', $mahasiswa->id)->delete();
             SimilarityScore::where('kandidat_id', $mahasiswa->id)->delete();
+
+            // Putuskan session & remember-me yang masih aktif
+            DB::table(config('session.table', 'sessions'))
+                ->where('user_id', $mahasiswa->id)
+                ->delete();
+            $mahasiswa->forceFill(['remember_token' => Str::random(60)])->save();
         } else {
-            // Aktifkan kembali: hitung ulang skor user ini terhadap seluruh kandidat aktif.
-            // Skor reverse (user lain → user ini) akan diisi saat masing-masing user lain
-            // mengedit profil; tapi untuk segera tersedia, kita recalc reverse di sini juga.
             $cbf = app(ContentBasedFilteringService::class);
+            // Forward (user → kandidat) + reverse (kandidat → user)
             $cbf->calculateForUser($mahasiswa);
+            $cbf->recalcReverseScores($mahasiswa);
         }
 
         $pesan = $newStatus === 'aktif'

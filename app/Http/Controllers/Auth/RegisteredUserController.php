@@ -11,7 +11,6 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
@@ -28,12 +27,14 @@ class RegisteredUserController extends Controller
     {
         $validated = $request->validated();
 
+        // role/status di-hardcode server-side — tidak dari input request.
+        // password plain: cast 'hashed' di model yang meng-hash.
         $user = User::create([
             'nama' => $validated['nama'],
             'jenis_kelamin' => $validated['jenis_kelamin'],
             'nim' => $validated['nim'],
             'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
+            'password' => $validated['password'],
             'role' => 'mahasiswa',
             'status' => 'aktif',
             'fakultas_id' => $validated['fakultas_id'],

@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\ActivityLog;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -50,7 +49,7 @@ class SettingTest extends TestCase
                 'password_confirmation' => 'new-password-123',
             ]);
 
-        $response->assertRedirect(route('profil.edit'));
+        $response->assertRedirect(route('setting.index'));
         $response->assertSessionHas('success');
         $this->assertTrue(
             \Illuminate\Support\Facades\Hash::check('new-password-123', $user->fresh()->password)
@@ -75,31 +74,15 @@ class SettingTest extends TestCase
         );
     }
 
-    public function test_mahasiswa_bisa_hapus_akun_sendiri_dengan_password_benar(): void
+    public function test_endpoint_hapus_akun_sudah_dihapus(): void
     {
         $user = $this->makeMahasiswaWithProfile();
 
+        // Route profil.destroy dihapus bersama UI "Hapus Akun".
         $response = $this->actingAs($user)
-            ->delete(route('profil.destroy'), [
-                'password' => 'password',
-            ]);
+            ->delete('/setting', ['password' => 'password']);
 
-        $response->assertRedirect('/');
-        $this->assertGuest();
-        $this->assertDatabaseHas('activity_logs', ['action' => 'mahasiswa.self-delete']);
-        $this->assertDatabaseMissing('users', ['id' => $user->id]);
-    }
-
-    public function test_hapus_akun_ditolak_jika_password_salah(): void
-    {
-        $user = $this->makeMahasiswaWithProfile();
-
-        $response = $this->actingAs($user)
-            ->delete(route('profil.destroy'), [
-                'password' => 'wrong-password',
-            ]);
-
-        $response->assertSessionHasErrorsIn('userDeletion');
+        $response->assertStatus(405); // method not allowed / no DELETE route
         $this->assertNotNull($user->fresh());
     }
 }

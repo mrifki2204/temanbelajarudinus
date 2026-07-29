@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Mahasiswa;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ProfilUpdateRequest extends FormRequest
 {
@@ -14,14 +15,14 @@ class ProfilUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Preferensi belajar
+            // Preferensi belajar — exists scoped per tipe (cegah cross-kategori)
             'minat' => ['required', 'array', 'min:1'],
-            'minat.*' => ['string', 'exists:opsi_preferensi,nilai'],
-            'tujuan' => ['required', 'string', 'exists:opsi_preferensi,nilai'],
-            'gaya' => ['required', 'string', 'exists:opsi_preferensi,nilai'],
+            'minat.*' => ['string', Rule::exists('opsi_preferensi', 'nilai')->where('tipe', 'minat')],
+            'tujuan' => ['required', 'string', Rule::exists('opsi_preferensi', 'nilai')->where('tipe', 'tujuan')],
+            'gaya' => ['required', 'string', Rule::exists('opsi_preferensi', 'nilai')->where('tipe', 'gaya')],
             'jadwal' => ['required', 'array', 'min:1'],
-            'jadwal.*' => ['string', 'exists:opsi_preferensi,nilai'],
-            'mode' => ['required', 'string', 'exists:opsi_preferensi,nilai'],
+            'jadwal.*' => ['string', Rule::exists('opsi_preferensi', 'nilai')->where('tipe', 'jadwal')],
+            'mode' => ['required', 'string', Rule::exists('opsi_preferensi', 'nilai')->where('tipe', 'mode')],
 
             // Kontak (wajib, baru terlihat setelah permintaan diterima)
             'whatsapp' => ['required', 'string', 'max:30', 'regex:/^[0-9+\-\s]+$/'],

@@ -187,10 +187,9 @@ class ContentBasedFilteringService
      */
     public function getTopN(User $target, int $n = 10, array $filter = [])
     {
-        // Catatan: kandidat yang sudah diajukan (pending) atau diterima (accepted)
-        // TETAP muncul di rekomendasi. Status hubungan ditampilkan di kartu/detail
-        // agar pengguna tahu kondisinya tanpa harus mencari ulang kandidat.
-        // Lihat getExcludedKandidatIds() untuk daftar kategori yang di-exclude.
+        // Catatan: kandidat pending/accepted/rejected TETAP muncul di rekomendasi.
+        // Status hubungan ditampilkan di kartu/detail (badge) agar pengguna tahu
+        // kondisinya; rejected boleh kirim ulang.
 
         $query = SimilarityScore::with(['kandidat.profile', 'kandidat.fakultas', 'kandidat.prodi'])
             ->where('user_id', $target->id)
@@ -226,28 +225,6 @@ class ContentBasedFilteringService
         }
 
         return $results->take($n)->values();
-    }
-
-    /**
-     * Ambil ID kandidat yang di-exclude dari rekomendasi.
-     * Saat ini hanya kandidat yang permintaannya ditolak (rejected) —
-     * kandidat pending/accepted TETAP muncul dengan badge status di kartu.
-     *
-     * @return int[]
-     */
-    protected function getExcludedKandidatIds(User $target): array
-    {
-        $sent = $target->sentRequests()
-            ->where('status', 'rejected')
-            ->pluck('penerima_id')
-            ->all();
-
-        $received = $target->receivedRequests()
-            ->where('status', 'rejected')
-            ->pluck('pengirim_id')
-            ->all();
-
-        return array_unique(array_merge($sent, $received));
     }
 
     /**
@@ -289,6 +266,41 @@ class ContentBasedFilteringService
     public function isProfileLengkap(Profile $profile): bool
     {
         return $profile->isPreferensiLengkap();
+    }
+
+    /**
+     * Hitung ulang skor reverse: seluruh user lain (profil lengkap) → $owner.
+     * Dipakai ProfileObserver + re-activate akun admin.
+     */
+    public function recalcReverseScores(User $owner): void
+    {
+        $ownerProfile = $owner->fresh('profile')?->profile;
+        if (! $ownerProfile || ! $this->isProfileLengkap($ownerProfile)) {
+            return;
+        }
+
+        $ownerVector = $this->buildFeatureVector($ownerProfile);
+
+        $otherUsers = User::where('role', 'mahasiswa')
+            ->where('status', 'aktif')
+            ->where('id', '!=', $owner->id)
+            ->whereHas('profile')
+            ->with('profile')
+            ->get();
+
+        foreach ($otherUsers as $otherUser) {
+            if (! $this->isProfileLengkap($otherUser->profile)) {
+                continue;
+            }
+
+            $otherVector = $this->buildFeatureVector($otherUser->profile);
+            $skor = $this->cosineSimilarity($otherVector, $ownerVector);
+
+            SimilarityScore::updateOrCreate(
+                ['user_id' => $otherUser->id, 'kandidat_id' => $owner->id],
+                ['skor' => $skor]
+            );
+        }
     }
 
     /**

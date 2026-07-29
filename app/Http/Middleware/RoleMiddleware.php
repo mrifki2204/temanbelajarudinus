@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
@@ -23,11 +22,8 @@ class RoleMiddleware
             return redirect()->route('login');
         }
 
-        // Cek status akun
-        if ($user->status !== 'aktif') {
-            Auth::logout();
-            return redirect()->route('login')->with('error', 'Akun Anda telah dinonaktifkan.');
-        }
+        // Status nonaktif ditangani EnsureUserIsActive (global web stack).
+        // Di sini hanya cek role.
 
         if (! in_array($user->role, $roles, true)) {
             // Mahasiswa yang mencoba akses area admin → arahkan ke dashboard mahasiswa
